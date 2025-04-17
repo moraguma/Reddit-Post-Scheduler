@@ -19,9 +19,8 @@ def post(reddit: praw.Reddit, post_data: dict) -> None:
         "flair": <name of flair if post has flair>
         "comment": <comment to add to the post>,
         "video": <video path for video posts>,
-        "image": <image path for image posts>,
+        "image": <image path for image posts. Can also be a gif>,
         "gallery": <list of image paths for gallery posts>
-        "gif": <gif for gif posts>,
         "url": <url for url posts>
         "body": <body of post for simple posts>
     }
@@ -50,8 +49,6 @@ def post(reddit: praw.Reddit, post_data: dict) -> None:
         for image_path in post_data["gallery"]:
             images.append({"image_path": image_path})
         submission: Submission = subreddit.submit_gallery(images=images, **kwargs)
-    elif "gif" in post_data:
-        submission: Submission = subreddit.submit_image(image_path=post_data["gif"], **kwargs)
     elif "url" in post_data:
         submission: Submission = subreddit.submit(url=post_data["url"], **kwargs)
     else:
@@ -74,51 +71,4 @@ if __name__ == '__main__':
         user_agent=f"{platform.system()}:RedditPostScheduler:{APP_VERSION} (by u/guambe) (being run by u/{credentials['username']})",
         username=credentials["username"]
     )
-
-    # post(reddit, {
-    #     "subreddit": "TestingPythonStuff",
-    #     "title": "Video post",
-    #     "flair": "test1",
-    #     "video": "media\Teleporter.mp4",
-    #     "comment": "This is a test comment\n\nHi!"
-    # })
-
-    # post(reddit, {
-    #     "subreddit": "TestingPythonStuff",
-    #     "title": "Image post",
-    #     "flair": "test😀",
-    #     "image": "media\\1.png",
-    #     "comment": "This is a test comment\n\nHi!"
-    # })
-
-    post(reddit, {
-        "subreddit": "TestingPythonStuff",
-        "title": "Galery post",
-        "flair": "test😀",
-        "gallery": ["media\\1.png", "media\\2.png", "media\\3.png"],
-        "comment": "This is a test comment\n\nHi!"
-    })
-
-    post(reddit, {
-        "subreddit": "TestingPythonStuff",
-        "title": "Gif post",
-        "flair": "test2",
-        "gif": "media\chainAndDash.gif",
-        "comment": "This is a test comment\n\nHi!"
-    })
-
-    post(reddit, {
-        "subreddit": "TestingPythonStuff",
-        "title": "Url post",
-        "flair": "test😀",
-        "url": "https://moraguma.itch.io/"
-    })
-
-    post(reddit, {
-        "subreddit": "TestingPythonStuff",
-        "title": "Simple post",
-        "flair": "test😀",
-        "body": "Test body"
-    })
-
     

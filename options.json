@@ -1,0 +1,4 @@
+{
+    "post_within_minute_range": 30,
+    "delete_post_from_days_ago": 7
+}
