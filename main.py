@@ -131,5 +131,6 @@ if __name__ == '__main__':
     changed = changed or post_scheduled(posts, options["post_within_minute_range"], reddit)
 
     # Saves posts.json
-    with open("posts.json", "w") as json_file:
-        json_file.write(json.dumps(posts, indent=4, separators=(',', ': ')))
+    if changed:
+        with open("posts.json", "w") as json_file:
+            json_file.write(json.dumps(posts, indent=4, separators=(',', ': ')))
