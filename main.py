@@ -108,7 +108,7 @@ def post_scheduled(posts: dict, minute_range: int, reddit: praw.Reddit) -> None:
 
 
 def json_as_dict(path: str) -> dict:
-    with open(path) as json_file:
+    with open(path, encoding="utf-8") as json_file:
         return json.load(json_file)
 
 
@@ -133,5 +133,5 @@ if __name__ == '__main__':
 
     # Saves posts.json
     if changed:
-        with open("posts.json", "w") as json_file:
+        with open("posts.json", "w", encoding="utf-8") as json_file:
             json_file.write(json.dumps(posts, indent=4, separators=(',', ': ')))
