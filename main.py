@@ -8,8 +8,6 @@ import logging
 
 
 APP_VERSION = "v0.1"
-AUTO_POST_TIME_TOLERANCE = 30.0
-SCHEDULED_POST_DELETE_TIME = 7
 
 
 logger = logging.getLogger(__name__)
