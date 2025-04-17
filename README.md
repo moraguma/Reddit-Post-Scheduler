@@ -2,14 +2,14 @@
 
 This is a script that allows posts to be scheduled and posted at a particular time to Reddit. 
 
-- [ ] Post scheduling at specifics times and subreddits
+- [x] Post scheduling at specifics times and subreddits
     - [x] Video posts
     - [x] Image posts
     - [x] Gallery posts
     - [x] Gif posts
     - [x] Url posts
     - [x] Regular posts
-- [ ] Creation of a comment in a just created post
+- [x] Creation of a comment in a just created post
 
 ## Setup
 
@@ -73,6 +73,29 @@ The file `options.json` can be modified to adjust the functionality of the progr
 
 Option | Description | Default value
 ---|---|---
-post_within_minute_range | Posts that are less than this many minutes away from their posting time will be posted when `main.py` is run | 30
+post_within_minute_range | Posts that are less than this many minutes away from their posting time will be posted when `main.py` is run | 20
 delete_post_from_days_ago | Posts that are schedule for a date more than this many days ago will be deleted from `posts.json` when `main.py` is run | 7
 
+## Example
+
+This example schedules two posts, a title-only post on r/AskReddit at 14:07 of the 12th of July of 2025, and an image post on r/SeveranceAppleTVPlus at 18:47 of the 3rd of June of 2025. With default configurations, these posts will be posted if `main.py` is run within 20 minutes of their posting times. 
+
+```json
+{
+    "posts": [
+        {
+            "time_to_post": "2025-07-12T14:07",
+            "subreddit": "AskReddit",
+            "title": "What's the first game you spent hundreds of hours on?",
+            "body": ""
+        },
+        {
+            "time_to_post": "2025-06-03T18:47",
+            "subreddit": "SeveranceAppleTVPlus",
+            "title": "I am very eagen to post this meme from tumblr",
+            "flair": "Meme",
+            "image": "media/severance_meme.png",
+        }
+    ]
+}
+```

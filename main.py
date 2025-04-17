@@ -1,7 +1,9 @@
 import praw
-from praw.models import InlineGif, InlineImage, InlineVideo, Subreddit, Submission
+from praw.models import Subreddit, Submission
 import json
 import platform
+from dateutil import parser
+from datetime import datetime
 
 
 APP_VERSION = "v0.1"
@@ -28,7 +30,6 @@ def post(reddit: praw.Reddit, post_data: dict) -> None:
     Note that data types above take precedent from ones below. This means that if video is provided all arguments
     below will be ignored and so forth
     """
-
     # Gets subreddit
     subreddit: Subreddit = reddit.subreddit(post_data["subreddit"])
 
@@ -58,12 +59,60 @@ def post(reddit: praw.Reddit, post_data: dict) -> None:
     if "comment" in post_data:
         submission.reply(post_data["comment"])
 
-    print(f"Created post {post_data['title']}")
+
+def delete_old_posts(posts: dict, delete_days_ago: int) -> None:
+    """
+    Deletes from posts all posts scheduled for a day more than delete_days_ago. Returns whether or not an operation was performed
+    """
+    deleted = False
+
+    now = datetime.now()
+    idx = 0
+    while idx < len(posts["posts"]):
+        scheduled_time = parser.parse(posts["posts"][idx]["time_to_post"])
+        elapsed_time = now - scheduled_time
+        if elapsed_time.days > delete_days_ago:
+            posts["posts"].pop(idx)
+            deleted = True
+        else:
+            idx += 1
+    return deleted
+
+
+def post_scheduled(posts: dict, minute_range: int, reddit: praw.Reddit) -> None:
+    """
+    Posts all posts that are scheduled within the given minute range. Returns whether or not at least one post was posted
+    """
+    posted = False
+
+    now = datetime.now()
+    for post_data in posts["posts"]:
+        if "posted" in post_data and post_data["posted"]:
+            continue
+
+        scheduled_time = parser.parse(post_data["time_to_post"])
+        elapsed_time = now - scheduled_time
+        if abs(elapsed_time.total_seconds()) / 60.0 < minute_range:
+            try:
+                post(reddit, post_data)
+                post_data["posted"] = True
+                posted = True
+                print(f"Posted {post_data['title']}")
+            except Exception as e:
+                print(f"Error - {e}")
+    return posted
+
+
+def json_as_dict(path: str) -> dict:
+    with open(path) as json_file:
+        return json.load(json_file)
 
 
 if __name__ == '__main__':
-    with open("credentials.json") as json_file:
-        credentials = json.load(json_file)
+    credentials = json_as_dict("credentials.json")
+    posts = json_as_dict("posts.json")
+    options = json_as_dict("options.json")
+
     reddit = praw.Reddit(
         client_id=credentials["client_id"],
         client_secret=credentials["client_secret"],
@@ -71,4 +120,11 @@ if __name__ == '__main__':
         user_agent=f"{platform.system()}:RedditPostScheduler:{APP_VERSION} (by u/guambe) (being run by u/{credentials['username']})",
         username=credentials["username"]
     )
+
+    changed = delete_old_posts(posts, options["delete_post_from_days_ago"])
+    changed = changed or post_scheduled(posts, options["post_within_minute_range"], reddit)
+
+    # Saves posts.json
+    with open("posts.json", "w") as json_file:
+        json_file.write(json.dumps(posts, indent=4, separators=(',', ': ')))
     
