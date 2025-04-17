@@ -99,3 +99,7 @@ This example schedules two posts, a title-only post on r/AskReddit at 14:07 of t
     ]
 }
 ```
+
+## Automating
+
+I am currently using Windows Scheduler to run main.py every 15 minutes (which you can learn how to do [here](https://www.youtube.com/watch?v=4n2fC97MNac)), but ideally this should probably run on a dedicated server.
