@@ -77,9 +77,9 @@ def delete_old_posts(posts: dict, delete_days_ago: int) -> None:
         scheduled_time = parser.parse(posts["posts"][idx]["time_to_post"])
         elapsed_time = now - scheduled_time
         if elapsed_time.days > delete_days_ago:
+            logger.info(f"Deleted old post \"{posts['posts'][idx]['title'] if 'title' in posts['posts'][idx] else 'UNNAMED'}\" on r/{posts['posts'][idx]['subreddit'] if 'subreddit' in posts['posts'][idx] else 'UNKNOWN'}")
             posts["posts"].pop(idx)
             deleted = True
-            logger.info(f"Deleted old post \'{posts['posts'][idx]['title'] if 'title' in posts['posts'][idx] else 'UNNAMED'}\' on r/{posts['subreddit'] if 'subreddit' in posts['posts'][idx] else 'UNKNOWN'}")
         else:
             idx += 1
     return deleted
@@ -127,8 +127,11 @@ if __name__ == '__main__':
         username=credentials["username"]
     )
 
-    changed = delete_old_posts(posts, options["delete_post_from_days_ago"])
-    changed = changed or post_scheduled(posts, options["post_within_minute_range"], reddit)
+    try:
+        changed = delete_old_posts(posts, options["delete_post_from_days_ago"])
+        changed = changed or post_scheduled(posts, options["post_within_minute_range"], reddit)
+    except Exception as e:
+        logger.exception(e)
 
     # Saves posts.json
     if changed:
