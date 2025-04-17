@@ -4,11 +4,16 @@ import json
 import platform
 from dateutil import parser
 from datetime import datetime
+import logging
 
 
 APP_VERSION = "v0.1"
 AUTO_POST_TIME_TOLERANCE = 30.0
 SCHEDULED_POST_DELETE_TIME = 7
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='main.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
 def post(reddit: praw.Reddit, post_data: dict) -> None:
@@ -74,6 +79,7 @@ def delete_old_posts(posts: dict, delete_days_ago: int) -> None:
         if elapsed_time.days > delete_days_ago:
             posts["posts"].pop(idx)
             deleted = True
+            logger.info(f"Deleted old post \'{posts['posts'][idx]['title'] if 'title' in posts['posts'][idx] else 'UNNAMED'}\' on r/{posts['subreddit'] if 'subreddit' in posts['posts'][idx] else 'UNKNOWN'}")
         else:
             idx += 1
     return deleted
@@ -97,9 +103,9 @@ def post_scheduled(posts: dict, minute_range: int, reddit: praw.Reddit) -> None:
                 post(reddit, post_data)
                 post_data["posted"] = True
                 posted = True
-                print(f"Posted {post_data['title']}")
+                logger.info(f"Posted \'{post_data['title']}\' on r/{post_data['subreddit']}")
             except Exception as e:
-                print(f"Error - {e}")
+                logger.exception(e)
     return posted
 
 
@@ -127,4 +133,3 @@ if __name__ == '__main__':
     # Saves posts.json
     with open("posts.json", "w") as json_file:
         json_file.write(json.dumps(posts, indent=4, separators=(',', ': ')))
-    
