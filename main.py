@@ -5,6 +5,7 @@ import platform
 from dateutil import parser
 from datetime import datetime
 import logging
+import cv2
 
 
 APP_VERSION = "v0.1"
@@ -45,7 +46,16 @@ def post(reddit: praw.Reddit, post_data: dict) -> None:
     # Submits post
     kwargs = {"title": post_data["title"], "flair_id": flair_id}
     if "video" in post_data:
-        submission: Submission = subreddit.submit_video(video_path=post_data["video"], timeout=30, **kwargs)
+        # Save first frame for thumbnail
+        cap = cv2.VideoCapture(post_data["video"])
+        ret, frame = cap.read()
+        
+        format_start = post_data["video"].find(".")
+        thumb_path = post_data["video"][:format_start] + ".png"
+
+        cv2.imwrite(thumb_path, frame)
+
+        submission: Submission = subreddit.submit_video(video_path=post_data["video"], timeout=30, thumbnail_path=thumb_path, **kwargs)
     elif "image" in post_data:
         submission: Submission = subreddit.submit_image(image_path=post_data["image"], timeout=30, **kwargs)
     elif "gallery" in post_data:

@@ -35,7 +35,7 @@ Then, create a file called `credentials.json` in the same folder as main.py with
 
 This should work on all versions of Python that support praw, but not that the project was only tested on Windows running Python 3.10.11
 
-First, you will need to install [PRAW](https://praw.readthedocs.io/en/stable/). You do this with pip using the following command or you can read about more option on the [docs](https://praw.readthedocs.io/en/stable/getting_started/installation.html)
+First, you will need to install [PRAW](https://praw.readthedocs.io/en/stable/) and [OpenCV](https://pypi.org/project/opencv-python/). You do this with pip using the following command or you can read about more option on the [docs](https://praw.readthedocs.io/en/stable/getting_started/installation.html)
 
 ```bash
 pip install praw
